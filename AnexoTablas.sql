@@ -1,0 +1,9 @@
+alter table Ciudadano RENAME COLUMN Nombre TO NombreCiu;
+alter table EPSReg RENAME COLUMN Nombre TO NombreEPS;
+alter table LoteVacuna RENAME COLUMN Nombre TO NombreVac;
+alter table LoteVacuna RENAME COLUMN Fecha TO FechaVac;
+alter table Cita RENAME COLUMN Fecha TO FechaCit;
+alter table EPSReg RENAME COLUMN Direccion TO DireccionEPS;
+alter table PuntoDeVacunacion RENAME COLUMN Direccion TO DireccionPto;
+alter table LoteVacuna RENAME COLUMN PtoAsignado TO PtoAsignadoLote;
+alter table Ciudadano RENAME COLUMN PtoAsignado TO PtoAsignadoCiu;

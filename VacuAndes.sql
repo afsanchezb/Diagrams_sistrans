@@ -1,0 +1,161 @@
+CREATE SEQUENCE SEQ_IDPto
+START WITH 1
+INCREMENT BY 1
+MAXVALUE 9999999999
+NOCYCLE;
+
+CREATE SEQUENCE SEQ_IDVac
+START WITH 1
+INCREMENT BY 1
+MAXVALUE 9999999999
+NOCYCLE;
+
+CREATE SEQUENCE SEQ_IDEPS
+START WITH 1
+INCREMENT BY 1
+MAXVALUE 9999999999
+NOCYCLE;
+
+CREATE SEQUENCE SEQ_IDCita
+START WITH 1
+INCREMENT BY 1
+MAXVALUE 99999999999999999999999999
+NOCYCLE;
+
+CREATE SEQUENCE SEQ_IDAvance
+START WITH 1
+INCREMENT BY 1
+MAXVALUE 9999999999
+NOCYCLE;
+
+CREATE TABLE PuntoDeVacunacion
+(
+ID_Pto NUMBER (10,0) NOT NULL PRIMARY KEY,
+Lugar VARCHAR (50) NOT NULL,
+Direccion VARCHAR (50) NOT NULL,
+MaxVacunas NUMBER (5,0) NOT NULL,
+Aforo NUMBER (3,0) NOT NULL,
+MaxCiudadanosDiarios NUMBER (4,0) NOT NULL,
+AnotacionesPreservacion VARCHAR (255) NOT NULL,
+EPSAsignada NUMBER (10,0) NOT NULL,
+CONSTRAINT CK_Lugar CHECK(Lugar='Hospital' OR Lugar='Clinica' OR Lugar='Centro de salud' OR Lugar='Otro')
+);
+
+CREATE TABLE LoteVacuna
+(
+ID_Vac NUMBER (38,0) NOT NULL PRIMARY KEY,
+Nombre VARCHAR (50) NOT NULL,
+CondicionPreserva VARCHAR (255) NOT NULL,
+DosisNesesarias NUMBER (1,0) NOT NULL,
+PtoAsignado NUMBER (10,0) NOT NULL,
+Cantidad NUMBER (6,0) NOT NULL,
+Fecha DATE NOT NULL,
+CONSTRAINT CK_Nombre CHECK(Nombre='Pfizer' OR Nombre='AstraZeneca' OR Nombre='CoronaVac')
+);
+
+CREATE TABLE Ciudadano
+(
+NoDocumento NUMBER (10,0) NOT NULL PRIMARY KEY,
+Nombre VARCHAR (40) NOT NULL,
+TipoDocumento VARCHAR (30) NOT NULL,
+PtoAsignado NUMBER (10,0),
+EPS NUMBER (10,0) NOT NULL,
+Estado VARCHAR (20) NOT NULL,
+CONSTRAINT CK_TipoDoc CHECK(TipoDocumento='CC' OR TipoDocumento='TI' OR TipoDocumento='CE'),
+CONSTRAINT CK_Estado CHECK(Estado='Vacunable' OR Estado='No Vacunable')
+);
+
+CREATE TABLE AdminEPSReg
+(
+NoDocumento NUMBER (10,0) NOT NULL PRIMARY KEY,
+EPSAsignada NUMBER (10,0) UNIQUE,
+CONSTRAINT FK_AdmnEPSNoDoc FOREIGN KEY (NoDocumento)
+REFERENCES Ciudadano(NoDocumento)
+);
+
+CREATE TABLE AdminPtoVac
+(
+NoDocumento NUMBER (10,0) NOT NULL PRIMARY KEY,
+PtoAsignado NUMBER (10,0) UNIQUE,
+CONSTRAINT FK_AdminPtoVacAsignado FOREIGN KEY (PtoAsignado)
+REFERENCES PuntoDeVacunacion(ID_Pto),
+CONSTRAINT FK_PtoVacNoDoc FOREIGN KEY (NoDocumento)
+REFERENCES Ciudadano(NoDocumento)
+);
+
+CREATE TABLE AdminPlanVac
+(
+NoDocumento NUMBER (10,0) NOT NULL PRIMARY KEY,
+Contrasenia VARCHAR (255) NOT NULL UNIQUE,
+CONSTRAINT FK_PlanVacNoDoc FOREIGN KEY (NoDocumento)
+REFERENCES Ciudadano(NoDocumento)
+);
+
+CREATE TABLE Operador
+(
+NoDocumento NUMBER (10,0) NOT NULL PRIMARY KEY,
+PtoVac NUMBER (10,0) NOT NULL,
+CONSTRAINT FK_OpPtoVacAsignado FOREIGN KEY (PtoVac)
+REFERENCES PuntoDeVacunacion(ID_Pto),
+CONSTRAINT FK_OpNoDoc FOREIGN KEY (NoDocumento)
+REFERENCES Ciudadano(NoDocumento)
+);
+
+CREATE TABLE EPSReg
+(
+ID_EPSReg NUMBER (10,0) NOT NULL PRIMARY KEY,
+Nombre VARCHAR (30) NOT NULL,
+Region VARCHAR (20) NOT NULL,
+Direccion VARCHAR (40) NOT NULL
+);
+
+CREATE TABLE Cita
+(
+ID_Cita NUMBER (26,0) NOT NULL PRIMARY KEY,
+Fecha DATE NOT NULL,
+CiudadanoAsignado NUMBER (10,0) NOT NULL,
+PtoVacAsignado NUMBER (10,0) NOT NULL,
+EstadoVac VARCHAR (10) NOT NULL,
+CONSTRAINT FK_CitNoDoc FOREIGN KEY (CiudadanoAsignado) 
+REFERENCES Ciudadano(NoDocumento),
+CONSTRAINT FK_CitPtoVacAsignado  FOREIGN KEY (PtoVacAsignado) 
+REFERENCES PuntoDeVacunacion(ID_Pto),
+CONSTRAINT CK_EstadoVac CHECK(EstadoVac='Atendido' OR EstadoVac='No Atendido')
+);
+
+CREATE TABLE ProcesoVac
+(
+ID_Avance NUMBER (26,0) NOT NULL PRIMARY KEY,
+NoRegistro NUMBER (1,0) NOT NULL,
+Comentarios VARCHAR (255) NOT NULL,
+Ciudadano NUMBER (10,0) NOT NULL,
+PtoVac NUMBER (10,0) NOT NULL,
+CONSTRAINT FK_AvanceCiudadano FOREIGN KEY (Ciudadano) 
+REFERENCES Ciudadano(NoDocumento),
+CONSTRAINT FK_AvancePtoVac FOREIGN KEY (PtoVac)
+REFERENCES PuntoDeVacunacion(ID_Pto)
+);
+
+alter table PuntoDeVacunacion
+ADD CONSTRAINT FK_EPSAsignada 
+FOREIGN KEY (EPSAsignada) REFERENCES EPSReg(ID_EPSReg);
+
+alter table Vacuna
+ADD CONSTRAINT FK_VacPtoVacAsignado 
+FOREIGN KEY (PtoAsignado) REFERENCES PuntoDeVacunacion(ID_Pto);
+
+alter table Ciudadano
+ADD CONSTRAINT FK_CiuPtoAsignado 
+FOREIGN KEY (PtoAsignado) REFERENCES PuntoDeVacunacion(ID_Pto);
+
+alter table Ciudadano
+ADD CONSTRAINT FK_CiuEPS 
+FOREIGN KEY (EPS) REFERENCES EPSReg(ID_EPSReg);
+
+alter table AdminEPSReg
+ADD CONSTRAINT FK_AdminEPSAsignada 
+FOREIGN KEY (EPSAsignada) REFERENCES EPSReg(ID_EPSReg);
+
+alter table EPSReg
+ADD CONSTRAINT CK_RegEPS 
+CHECK (Region='Amazonia' OR Region='Pacifica' OR Region='Andina' OR Region='Insular' OR Region='Orinoquia' OR Region='Caribe');
