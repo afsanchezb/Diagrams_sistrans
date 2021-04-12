@@ -293,6 +293,37 @@ VALUES (1007475511, 'Lolcito123');
 INSERT INTO Operador(NoDocumento, PtoVac)
 VALUES (1007478990, 1);
 
+--R10 MODIFICACION
 UPDATE Ciudadano
 SET PtoAsignado = "puesto a asignar"
 WHERE Ciudadano.id = "ciudadano a asignar";
+
+--R11 MODIFICACION
+INSERT INTO Cita(id_cita,fechacit,ciudadanoasignado,ptovacasignado)
+VALUES (SEQ_IDCit, "Fecha de la cita", "Ciudadano al que asignar la cita", "pto de vac en donde tendra lugar");
+
+--R12 MODIFICACION
+INSERT INTO ProcesoVac(id_avance, noregistro, comentarios, ciudadano, ptovac)
+VALUES (SEQ_IDProc.curval, "numero del registro del paciente", "comentarios del avance","ciudadano al que asignar registro de avance", "pto de vac de atencion");
+
+--R1 CONSULTA
+SELECT Nombre, NoDocumento
+FROM Ciudadano c, PuntoDeVacunacion p, Cita ct
+WHERE ct.fechacit="fecha de la consulta"
+AND c.ptoasignado="pto de vac de la consulta";
+
+--R1 CONSULTA
+SELECT Nombre, NoDocumento
+FROM Ciudadano c, PuntoDeVacunacion p, Cita ct
+WHERE ct.fechacit BETWEEN "Fecha 1 del intervalo" AND "Fecha 2 del intervalo"
+AND c.ptoasignado="pto de vac de la consulta";
+
+--R2 CONSULTA
+SELECT id_pto,lugar,eps
+FROM PuntoDeVacunacion p, Cita c
+GROUP BY p.id_pto 
+HAVING c.estadovac='Atendido' 
+AND c.fechacit BETWEEN "Fecha 1 del intervalo" AND "Fecha 2 del intervalo"
+
+
+
