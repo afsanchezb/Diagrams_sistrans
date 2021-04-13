@@ -324,6 +324,7 @@ FROM PuntoDeVacunacion p, Cita c
 GROUP BY p.id_pto 
 HAVING c.estadovac='Atendido' 
 AND c.fechacit BETWEEN "Fecha 1 del intervalo" AND "Fecha 2 del intervalo"
+ORDER BY Total;
 
 
 
