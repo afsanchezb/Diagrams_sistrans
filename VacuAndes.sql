@@ -77,6 +77,8 @@ CREATE TABLE AdminPtoVac
 (
 NoDocumento NUMBER (10,0) NOT NULL PRIMARY KEY,
 PtoAsignado NUMBER (10,0) UNIQUE,
+TipoTalento VARCHAR (20,0),
+CONSTRAINT CK_AdminTipo CHECK(TipoTalento='Seguridad' OR TipoTalento='Salud'),
 CONSTRAINT FK_AdminPtoVacAsignado FOREIGN KEY (PtoAsignado)
 REFERENCES PuntoDeVacunacion(ID_Pto),
 CONSTRAINT FK_PtoVacNoDoc FOREIGN KEY (NoDocumento)
